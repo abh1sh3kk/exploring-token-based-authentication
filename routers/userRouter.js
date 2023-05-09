@@ -9,28 +9,25 @@ router.get("/", (req, res) => {
 });
 
 router.post("/signin", async (req, res) => {
-    // check if the user exists in the database
-    // check the password
-    // create a jwt token
-    // send it to the client
-
-    // UserModel.findOne()
     const email = req.body.email;
     const password = req.body.password;
 
+    try {
+        const foundUser = await UserModel.findOne({ email: email });
+        if (foundUser === null) {
+            return res.send("User Not Found");
+        }
+        console.log(`Found user is: ${foundUser}`);
 
-    // try {
-    //     const foundUser = await UserModel.find({ email: email });
-    //     if (foundUser === null) {
-    //         return res.send("I am sorry but the user is not found.");
-    //     } else {
-    //         console.log(`Found user is  ${foundUser}`);
-    //     }
-    // } catch (e) {
-    //     console.log("Error while finding the user.", e);
-    // }
-
-    res.send(`Your email is ${email} and your password is ${password}`);
+        // User exists, now we compare the password
+        const isPwCorrect = await bcrypt.compare(password, foundUser.password);
+        if (isPwCorrect) {
+            return res.send("You are a verified User.");
+        }
+        return res.send("Sorry the password you entered is incorrect");
+    } catch (e) {
+        console.log(`There seems to be an error ${e}`);
+    }
 });
 
 router.post("/signup", async (req, res) => {
@@ -38,11 +35,22 @@ router.post("/signup", async (req, res) => {
     const password = req.body.password;
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const userData = { email, password: hashedPassword };
+    
+
+    const userData = {
+        email,
+        password: hashedPassword,
+    };
 
     try {
+        const existingUser = await UserModel.findOne({email: email});
+        if (existingUser !== null ) {
+            console.log(existingUser);
+            return res.send("User Already Exists. Enter a new Email Address.")
+        }
         const insertedUser = await UserModel.create(userData);
         console.log(`inserted user is ${insertedUser}`);
+        return res.send("User successfully created")
     } catch (e) {
         console.log(`Error detected in inserting the userdata ${e}`);
     }
@@ -51,9 +59,6 @@ router.post("/signup", async (req, res) => {
     // receive the credentials
     // hash the password and store it
     // create a jwt token and send it to the client
-    res.send(
-        "Hi, my existence is merely for the acknowledgement of your post request."
-    );
 });
 
 router.get("/signin", (req, res) => {
