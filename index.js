@@ -61,14 +61,24 @@ app.get("/refresh", (req, res) => {
         refresh_token: refresh_token,
     };
 
-    return res.cookie("jwt", newCookie).send("Access Token Updated");
+    const textToRender = `<h1>Access Token Updated:</h1> 
+    <b>Before:</b> <pre>${access_token}</pre>
+
+
+    <b>After:</b> <pre>${newAccessToken}</pre>
+    
+    
+    <h3>Trust me they are different</h3>
+    `
+
+    return res.cookie("jwt", newCookie).send(textToRender);
 });
 
 app.get("/validate", (req, res) => {
     const cookiess = req.cookies && req.cookies.jwt;
     console.log(`cookies to validate`, cookiess);
 
-    res.send("see the log");
+    res.send(cookiess);
 });
 
 // -----------------------------------------------------------------------------

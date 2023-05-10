@@ -4,10 +4,12 @@
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<link rel="stylesheet" href="/css/homepage.css">
+        <link rel="stylesheet" href="/css/homepage.css" />
+        <link rel="stylesheet" href="/css/navbar.css" />
         <title>Document</title>
     </head>
     <body>
+        <%- include ('../partials/navbar.ejs') %>
         <div class="container">
             <div class="content">
                 <div class="square twitch" style="margin-bottom: 50px">
@@ -16,22 +18,9 @@
                     <span class="three"></span>
                     <div class="circle">
                         <h2 class="DrugRadar">JWT Tokens</h2>
-                        <p>
-                            Random page copied from codepen
-                        </p>
+                        <p>Random page copied from codepen</p>
                     </div>
                 </div>
-
-                <a
-                    href=""
-                    class="button"
-                    target="_parent"
-                >
-                    <span class="actual-text">&nbsp;Dashboard&nbsp;</span>
-                    <span class="hover-text" aria-hidden="true"
-                        >&nbsp;Dashboard&nbsp;</span
-                    >
-                </a>
             </div>
         </div>
     </body>
