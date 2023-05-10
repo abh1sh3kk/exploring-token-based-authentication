@@ -4,6 +4,9 @@ const userRouter = require("./routers/userRouter");
 const dataRouter = require("./routers/dataRouter");
 require("./controllers/db");
 const cookieParser = require("cookie-parser");
+const { generateJwtToken } = require("./src/utils/utils");
+const jwt = require("jsonwebtoken");
+const userTokens = require("./models/userTokens");
 // -----------------------------------------------------------------------------
 app.use(cookieParser());
 app.set("view engine", "ejs");
@@ -15,6 +18,57 @@ app.use("/data", dataRouter);
 
 app.get("/", (req, res) => {
     res.render("./layouts/homepage");
+});
+
+app.get("/refresh", (req, res) => {
+    const cookiess = req.cookies && req.cookies.jwt;
+
+    // -----------------------------------------------------------------------------
+    if (!cookiess) return res.send("Sorry you don't have any cookies");
+    if (!cookiess.refresh_token)
+        return res.send("sorry you don't have refresh token");
+    // -----------------------------------------------------------------------------
+
+    const { refresh_token, access_token } = cookiess;
+
+    // -----------------------------------------------------------------------------
+    // change the payload to generate unique access_token each time it refreshes
+    // -----------------------------------------------------------------------------
+    const decodedToken = jwt.decode(access_token);
+    decodedToken.refreshCount++;
+    const newAccessToken = generateJwtToken(
+        decodedToken,
+        process.env.ACCESS_TOKEN_TIME
+    );
+    // -----------------------------------------------------------------------------
+
+    const jwtForDB = {
+        userId: decodedToken.id,
+        access_token: newAccessToken,
+        refresh_token: refresh_token,
+    };
+
+    userTokens.findOneAndUpdate({ userId: decodedToken.id }, jwtForDB, {
+        upsert: true,
+        new: true,
+    });
+
+    // -----------------------------------------------------------------------------
+
+    const newCookie = {
+        status: "Logged In",
+        access_token: newAccessToken,
+        refresh_token: refresh_token,
+    };
+
+    return res.cookie("jwt", newCookie).send("Access Token Updated");
+});
+
+app.get("/validate", (req, res) => {
+    const cookiess = req.cookies && req.cookies.jwt;
+    console.log(`cookies to validate`, cookiess);
+
+    res.send("see the log");
 });
 
 // -----------------------------------------------------------------------------
