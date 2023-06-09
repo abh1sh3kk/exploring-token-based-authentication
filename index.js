@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const userRouter = require("./routers/userRouter");
 const dataRouter = require("./routers/dataRouter");
-require("./controllers/db");
+require("./src/db");
 const cookieParser = require("cookie-parser");
 const { generateJwtToken } = require("./src/utils/utils");
 const jwt = require("jsonwebtoken");
